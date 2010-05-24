@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:net="com.xm.rso.flash.net.*" creationComplete="application1_creationCompleteHandler(event)">
+
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			
+			import org.osmf.net.NetConnectionCodes;
+			
+			private var _ns:NetStream;
+			
+			private var mic:Microphone;
+			private var camera:Camera;
+			
+			protected function startRecordBtn_clickHandler(event:MouseEvent):void
+			{
+				nc.connect("rtmp://localhost/record");
+			}
+
+
+			protected function nc_netStatusHandler(event:NetStatusEvent):void
+			{
+				trace(event.info.code);
+				switch(event.info.code){
+					case NetConnectionCodes.CONNECT_SUCCESS:
+						
+						_ns=new NetStream(nc);
+						
+						mic=Microphone.getMicrophone();
+						if(mic!=null){
+							_ns.attachAudio(mic);
+						}else{
+							Alert.show("你没麦或者你的麦正在被其它程序使用","提示");
+						}
+						
+						
+						camera=Camera.getCamera();
+						if(camera!=null){
+							_ns.attachCamera(camera);
+						}else{
+							Alert.show("找不到摄像头");
+						}
+						_ns.publish("heteng","record");
+						break;
+				}
+			}
+
+
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				
+			}
+
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		
+		<net:CustomNetConnection  id="nc" netStatus="nc_netStatusHandler(event)"/>
+	</fx:Declarations>
+	<s:Button x="62" y="72" label="开始录制" id="startRecordBtn" click="startRecordBtn_clickHandler(event)"/>
+</s:Application>

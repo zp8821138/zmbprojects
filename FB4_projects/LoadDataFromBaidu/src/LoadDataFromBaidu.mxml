@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:net="com.xm.loaddatafrombaidu.flash.net.*">
+
+	<fx:Script>
+		<![CDATA[
+			
+			private const BAIDU_MP3_URL:String="http://mp3.baidu.com/m";
+			
+			
+			protected function baiduBtn_clickHandler(event:MouseEvent):void
+			{
+				var req:URLRequest=new URLRequest(BAIDU_MP3_URL);
+				req.method= URLRequestMethod.GET;
+				var data:URLVariables=new URLVariables;
+				data.ct="134217728";
+				data.word=inputTxt.text;
+				req.data=data;
+				ul.load(req);
+			}
+
+			protected function ul_completeHandler(event:Event):void
+			{
+				var bytes:ByteArray=ul.data as ByteArray;
+				outTxt.text=bytes.readMultiByte(bytes.bytesAvailable,"gbk");
+			}
+
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<net:CustomURLLoader id="ul" dataFormat="{URLLoaderDataFormat.BINARY}" complete="ul_completeHandler(event)"/>
+	</fx:Declarations>
+	<s:TextInput x="10" y="10" width="453" id="inputTxt"/>
+	<s:Button id="baiduBtn" x="471" y="10" label="百度一下" click="baiduBtn_clickHandler(event)"/>
+	<s:TextArea id="outTxt" left="10" top="40" right="10" bottom="10" width="100%" height="100%"/>
+</s:Application>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/halo" 
+					   mouseDown="windowedapplication1_mouseDownHandler(event)"
+					    closing="windowedapplication1_closingHandler(event)">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import flash.events.Event;
+			import flash.events.MouseEvent;
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+
+			protected function windowedapplication1_mouseDownHandler(event:MouseEvent):void
+			{
+				this.nativeWindow.startMove();
+			}
+
+
+			protected function windowedapplication1_closingHandler(event:Event):void
+			{
+				event.preventDefault();
+				Alert.show("你要关闭此窗体吗?","提示",Alert.OK|Alert.CANCEL,null,closeAlertHandler);
+			}
+			
+			private function closeAlertHandler(event:CloseEvent):void{
+				switch(event.detail){
+					case Alert.OK:
+						this.nativeWindow.close();
+						break;
+				}
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+</s:WindowedApplication>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" showStatusBar="false" creationComplete="windowedapplication1_creationCompleteHandler(event)">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			private var windowMenu:NativeMenu=new NativeMenu;
+			private var fileMenu:NativeMenu=new NativeMenu;
+			private var openItem:NativeMenuItem=new NativeMenuItem("打开FLV文件");
+			private var quitItem:NativeMenuItem=new NativeMenuItem("退出");
+			private var fileFilter:FileFilter=new FileFilter("flv文件","*.flv");
+			private var file:File;
+
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				windowMenu.addSubmenu(fileMenu,"文件");
+				fileMenu.addItem(openItem);
+				fileMenu.addItem(new NativeMenuItem("",true));
+				fileMenu.addItem(quitItem);
+				
+				this.nativeWindow.menu=windowMenu;
+				
+				openItem.addEventListener(Event.SELECT,selectHandler);
+				quitItem.addEventListener(Event.SELECT,selectHandler);
+			}
+			
+			private function selectHandler(event:Event):void{
+				switch(event.target){
+					case openItem:
+						file=new File;
+						file.addEventListener(Event.SELECT,selectFileHandler);
+						file.browseForOpen("打开FLV文件",[fileFilter]);
+						break;
+					case quitItem:
+						NativeApplication.nativeApplication.exit();
+						break;
+				}
+			}
+			
+			private function selectFileHandler(event:Event):void{
+				file.removeEventListener(Event.SELECT,selectFileHandler);
+				
+				videoPlayer.source=file.url;
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:VideoPlayer id="videoPlayer" width="100%" height="100%"/>
+</s:WindowedApplication>

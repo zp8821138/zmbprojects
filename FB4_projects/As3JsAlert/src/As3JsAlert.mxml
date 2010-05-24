@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/halo">
+	<fx:Script>
+		<![CDATA[
+
+
+			protected function showJsAlert_clickHandler(event:MouseEvent):void
+			{
+//				while(true){
+//					alert("哈哈，气死你");
+//				}
+				
+//				try{
+//					throw new Error("Oh,my god,我的错");
+//				}catch(e:Error){
+//					trace(e.getStackTrace());
+//				}
+			}
+			
+			private function alert(value:String):void{
+				
+				try{
+					ExternalInterface.call("alert",value);
+				}catch(error:Error){
+					
+				}
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:Button label="弹出js提示框" id="showJsAlert" click="showJsAlert_clickHandler(event)"/>
+</s:Application>

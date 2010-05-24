@@ -1,0 +1,17 @@
+<data>
+	<classes>
+		<name>as3</name>
+		<teacher>me</teacher>
+		<student>you</student>
+	</classes>
+	<classes>
+		<name>php</name>
+		<teacher>shaojia</teacher>
+		<student>heteng</student>
+	</classes>
+	<classes>
+		<name>ObjC</name>
+		<teacher>shaojia</teacher>
+		<student>yigao</student>
+	</classes>
+</data>

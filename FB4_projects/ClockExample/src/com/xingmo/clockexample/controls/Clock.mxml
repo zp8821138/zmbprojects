@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300" creationComplete="group1_creationCompleteHandler(event)" fontFamily="Courier New" fontSize="25">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	<fx:Metadata>
+		
+		/**
+		 * 当指定的闹铃时间与当前时间相同时，则触发此事件
+		 */
+		[Event(name="wakeUp",type="com.xingmo.clockexample.controls.ClockEvent")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			
+			private var _timer:Timer=new Timer(1000);
+			
+			private var _date:Date;
+			
+			public function getClassName():String{
+				return "Clock";
+			}
+
+			protected function group1_creationCompleteHandler(event:FlexEvent):void
+			{
+				_timer.addEventListener(TimerEvent.TIMER,timerHandler);
+				_timer.start();
+			}
+			
+			private function timerHandler(event:TimerEvent):void{
+				_date=new Date;
+				this.clockLabel.text=formatDate(_date.getHours())+":"+formatDate(_date.getMinutes())+":"+formatDate(_date.getSeconds());
+				
+				if(this.clockLabel.text==this.wakeUpTxt.text){
+					trace(">>run here");
+					
+					var evt:ClockEvent=new ClockEvent(ClockEvent.WAKE_UP);
+					evt.setCurrentDate(_date);
+					dispatchEvent(evt);
+				}
+			}
+			
+			
+			private function formatDate(value:int):String{
+				if(value>=10){
+					return String(value);
+				}else{
+					return "0"+value;
+				}
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Label id="clockLabel" x="78" y="41" color="#FF0101" fontWeight="bold" width="237"/>
+	<s:Label x="78" y="100" text="闹铃时间："/>
+	<s:TextInput x="78" y="154" id="wakeUpTxt"/>
+</s:Group>

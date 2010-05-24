@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:controls="com.xingmo.clockexample.controls.*"> 
+	<!-- creationComplete="application1_creationCompleteHandler(event)"-->
+	
+	<fx:Script>
+		<![CDATA[
+			import com.xingmo.clockexample.controls.ClockEvent;
+			
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+
+			
+			/*private function clockHandler(event:Event):void{
+				trace("闹铃响了");
+			}
+
+
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				clock.addEventListener(ClockEvent.CLOCK,clockHandler);
+			}*/
+
+
+			protected function clock_wakeUpHandler(event:ClockEvent):void
+			{
+				Alert.show("闹铃响了");
+				trace(event.type);
+				trace(event.currentDate);
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<controls:Clock id="clock" x="21" y="20" wakeUp="clock_wakeUpHandler(event)"/>
+</s:Application>

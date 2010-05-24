@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/halo"
+					    creationComplete="windowedapplication1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import flash.events.ServerSocketConnectEvent;
+			import flash.net.ServerSocket;
+			
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+
+			private var _serverSocket:ServerSocket=new ServerSocket;
+			
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				_serverSocket.bind(8888);
+				_serverSocket.listen();
+				
+				ChatServer.outPut(">>Server started at port 8888");
+				
+				_serverSocket.addEventListener(ServerSocketConnectEvent.CONNECT,connectHandler);
+			}
+			
+			private function connectHandler(event:ServerSocketConnectEvent):void{
+//				var s:Socket=event.socket;
+//				s.writeUTFBytes("Hello Client");
+//				s.flush();
+				
+				ChatServer.outPut("A new connection connected");
+				
+				new SocketConnection(event.socket);
+			}
+			
+			public static function outPut(value:String):void{
+				ChatServer(FlexGlobals.topLevelApplication).outTxt.appendText(value+"\n");
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:TextArea id="outTxt" width="100%" height="100%"/>
+</s:WindowedApplication>

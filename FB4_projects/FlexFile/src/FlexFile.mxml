@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Button x="34" y="49" label="按钮"/>
+	<s:CheckBox x="140" y="49" label="CheckBox"/>
+	<mx:ColorPicker x="29" y="94"/>
+	<s:HSlider x="120" y="105"/>
+	<s:TextArea x="32" y="138"/>
+</s:Application>

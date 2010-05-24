@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:weatherwebservice="services.weatherwebservice.*">
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.rpc.events.ResultEvent;
+			
+			protected function callBtn_clickHandler(event:MouseEvent):void
+			{
+				getWeatherbyCityNameResult.token = weatherWebService.getWeatherbyCityName(inTxt.text);
+			}
+			
+
+			protected function getWeatherbyCityNameResult_resultHandler(event:ResultEvent):void
+			{
+				outTxt.appendText(event.result+"\n\n");
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<s:CallResponder id="getWeatherbyCityNameResult" result="getWeatherbyCityNameResult_resultHandler(event)"/>
+		<weatherwebservice:WeatherWebService id="weatherWebService" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Button x="223" y="27" label="取得天气" id="callBtn" click="callBtn_clickHandler(event)"/>
+	<s:TextInput x="81" y="25" id="inTxt"/>
+	<s:Label x="21" y="30" text="城市名称:"/>
+	<s:TextArea  left="20" top="60" bottom="10" right="20" width="100%" height="100%" id="outTxt"/>
+</s:Application>
