@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/halo">
+	<fx:Script>
+		<![CDATA[
+			import flash.events.Event;
+			import flash.events.MouseEvent;
+			import flash.net.FileFilter;
+			
+			private var _file:File=new File("C:\\Windows\\System32\\shutdown.exe");
+
+			protected function callExe_clickHandler(event:MouseEvent):void
+			{
+				var p:NativeProcess=new NativeProcess;
+				
+				var info:NativeProcessStartupInfo=new NativeProcessStartupInfo;
+				info.executable=_file;
+				info.arguments.push("/s");
+				info.arguments.push("/t");
+				info.arguments.push("3600");
+				
+				p.start(info);
+			}
+
+
+			protected function browse_clickHandler(event:MouseEvent):void
+			{
+				_file=new File;
+				_file.addEventListener(Event.SELECT,selectFile);
+				_file.browseForOpen("打开一个文件",[new FileFilter("可执行文件","*.exe")]);
+			}
+			
+			private function selectFile(event:Event):void{
+				_file.removeEventListener(Event.SELECT,selectFile);
+				
+				this.inputTxt.text=_file.nativePath;
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:TextInput id="inputTxt" width="200"/>
+	<s:Button x="210" label="浏览" id="browse" click="browse_clickHandler(event)"/>
+	<s:Button y="30" id="callExe" label="打开此文件" click="callExe_clickHandler(event)"/>
+</s:WindowedApplication>

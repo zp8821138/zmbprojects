@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:cee="com.xingmo.cee.*">
+
+	<fx:Script>
+		<![CDATA[
+			import adobe.utils.CustomActions;
+			
+			import com.xingmo.cee.CustomWindow;
+			import com.xingmo.cee.CustomWindowAs;
+			import com.xingmo.cee.CustomWindowEvent;
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			
+			
+			private var _currentOpratingWindow:Object;
+			
+			protected function btn_clickHandler(event:MouseEvent):void
+			{
+				var win:CustomWindow=CustomWindow.show("Hello")
+				win.addEventListener(CustomWindowEvent.CUSTOM_WINDOW_CLOSING,customWindowClosingHandler);
+				win.addEventListener(CustomWindowEvent.CUSTOM_WINDOW_CLOSE,customWindowCloseHandler);
+			}
+			
+			protected function btn0_clickHandler(event:MouseEvent):void
+			{
+				var win:CustomWindowAs=CustomWindowAs.show("Hello");
+				win.addEventListener(CustomWindowEvent.CUSTOM_WINDOW_CLOSING,customWindowClosingHandler);
+				win.addEventListener(CustomWindowEvent.CUSTOM_WINDOW_CLOSE,customWindowCloseHandler);
+			}
+			
+			private function customWindowClosingHandler(event:CustomWindowEvent):void{
+				event.preventDefault();
+				
+				_currentOpratingWindow=event.target;
+				Alert.show("是否真的要关闭这个窗体","提示",Alert.OK|Alert.CANCEL,null,closeHandler);
+			}
+			
+			private function closeHandler(event:CloseEvent):void{
+				if(event.detail==Alert.OK){
+					_currentOpratingWindow.close();
+				}
+			}
+			
+			private function customWindowCloseHandler(event:CustomWindowEvent):void{
+				Alert.show(event.type);
+				
+				var win:Object=event.target;
+				win.removeEventListener(CustomWindowEvent.CUSTOM_WINDOW_CLOSING,customWindowClosingHandler);
+				win.removeEventListener(CustomWindowEvent.CUSTOM_WINDOW_CLOSE,customWindowCloseHandler);
+			}
+
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<s:Button id="btn" label="弹出CustomWindow窗体" click="btn_clickHandler(event)"/>
+	<s:Button id="btn0" label="弹出CustomWindowAs窗体" x="0" y="32" click="btn0_clickHandler(event)"/>
+</s:Application>

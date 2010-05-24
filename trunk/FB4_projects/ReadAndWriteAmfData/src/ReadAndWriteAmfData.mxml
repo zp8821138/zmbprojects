@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx">
+
+	<fx:Script>
+		<![CDATA[
+			import flash.net.registerClassAlias;
+			import flash.utils.getQualifiedClassName;
+			
+			import mx.events.FlexEvent;
+			import mx.graphics.codec.PNGEncoder;
+			
+			private var fr:FileReference;
+			private var mvType:Array=[new FileFilter("*.mv","*.mv")];
+			private var loader:Loader=new Loader;
+			
+			protected function saveBtn_clickHandler(event:MouseEvent):void
+			{
+				fr=new FileReference;
+				
+				var obj:Object={};
+				obj.creatorName="Heteng";
+				obj.createDate=new Date().toString();
+				
+				var bitmapData:BitmapData=new BitmapData(this.width,this.height,true);
+				bitmapData.draw(this);
+				var pngEn:PNGEncoder=new PNGEncoder();
+				var image:ByteArray=pngEn.encode(bitmapData);
+				obj.imageData=image;
+				
+				//向AVM虚拟机注册该对象类型
+				registerClassAlias("FileRe",FileReference);
+				obj.fr=fr;
+				
+				
+				
+				var bytes:ByteArray=new ByteArray;
+				bytes.writeObject(obj);
+				bytes.compress();
+				
+				fr.save(bytes,"test.mv");
+			}
+
+			protected function readBtn_clickHandler(event:MouseEvent):void
+			{
+				fr=new FileReference;
+				fr.browse(mvType);
+				fr.addEventListener(Event.SELECT,selectHandler);
+			}
+			
+			private function selectHandler(event:Event):void{
+				fr.removeEventListener(Event.SELECT,selectHandler);
+				
+				fr.addEventListener(Event.COMPLETE,fileLoadedHandler);
+				fr.load();
+			}
+			
+			private function fileLoadedHandler(event:Event):void{
+				fr.removeEventListener(Event.SELECT,fileLoadedHandler);
+				
+				var bytes:ByteArray=fr.data;
+				bytes.uncompress();
+				
+				var obj:Object=bytes.readObject();
+				
+				loader.unloadAndStop();
+				loader.loadBytes(obj.imageData);
+				
+				for(var i:String in obj){
+					trace(i+",type:"+getQualifiedClassName(obj[i]));
+				}
+			}
+
+
+			protected function imageContainer_creationCompleteHandler(event:FlexEvent):void
+			{
+				imageContainer.addChild(loader);
+			}
+
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Button x="10" y="10" label="保存为Amf格式" id="saveBtn" click="saveBtn_clickHandler(event)"/>
+	<s:Button x="133" y="10" label="读取Amf格式" id="readBtn" click="readBtn_clickHandler(event)"/>
+	<mx:UIComponent id="imageContainer" top="40" width="100%" height="100%" creationComplete="imageContainer_creationCompleteHandler(event)"/>
+</s:Application>

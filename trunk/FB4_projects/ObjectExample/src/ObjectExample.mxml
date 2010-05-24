@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="application1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import com.adobe.serialization.json.JSONDecoder;
+			import com.adobe.serialization.json.JSONEncoder;
+			
+			import mx.events.FlexEvent;
+
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+//				var obj:Object={};
+//				obj.hello="Hello world";
+//				obj.obj={};
+//				obj.obj.hello="hello";
+//				
+//				var jsonEn:JSONEncoder=new JSONEncoder(obj);
+				
+				//var jsonDe:JSONDecoder=new JSONDecoder(result);
+				//trace(jsonDe.getValue().hello);
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</s:Application>

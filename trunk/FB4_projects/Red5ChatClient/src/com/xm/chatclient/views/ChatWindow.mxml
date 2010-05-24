@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300" close="titlewindow1_closeHandler(event)">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.xm.chatclient.net.NetConnectionManager;
+			import com.xm.chatclient.user.User;
+			import com.xm.chatclient.user.UserInfo;
+			
+			import mx.core.FlexGlobals;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			private static var __chatWindowVec:Vector.<ChatWindow>=new Vector.<ChatWindow>;
+			
+			public static function getChatWindow(user:User,initChatMsg:String="",initChatMsgDate:String=""):ChatWindow{
+				var chatWin:ChatWindow=new ChatWindow;
+				chatWin.targetUser=user;
+				chatWin.title="和 "+chatWin.targetUserName+" 聊天中...";
+				chatWin.initChatMsgDate=initChatMsgDate;
+				chatWin.initChatMsg=initChatMsg;
+				PopUpManager.addPopUp(chatWin,FlexGlobals.topLevelApplication as DisplayObject);
+				PopUpManager.centerPopUp(chatWin);
+				
+				__chatWindowVec.push(chatWin);
+				return chatWin;
+			}
+			
+			public static function receiveMsg(userName:String,userID:String,msg:String,date:String):void{
+				//当前是否有这样的聊天窗体
+				var hasChatWin:Boolean=false;
+				for each(var chatWin:ChatWindow in __chatWindowVec){
+					if(chatWin.targetUserID==userID){
+						chatWin.receiveMsg(userName,msg,date);
+						hasChatWin=true;
+						break;
+					}
+				}
+				if(!hasChatWin){
+					getChatWindow(new User(userName,userID),msg,date);
+				}
+			}
+			
+			public static function removeChatWindow(chatWin:ChatWindow):void{
+				for(var i:int=0;i<__chatWindowVec.length;i++){
+					if(__chatWindowVec[i]==chatWin){
+						__chatWindowVec.splice(i,1);
+						break;
+					}
+				}
+			}
+			
+			private var _initChatMsg:String="";
+
+			private function get initChatMsg():String
+			{
+				return _initChatMsg;
+			}
+
+			private function set initChatMsg(value:String):void
+			{
+				_initChatMsg = value;
+				if(outTxt!=null){
+					this.receiveMsg(targetUserName,initChatMsg,initChatMsgDate);
+				}
+			}
+
+			
+			private var _initChatMsgDate:String="";
+
+			private function get initChatMsgDate():String
+			{
+				return _initChatMsgDate;
+			}
+
+			private function set initChatMsgDate(value:String):void
+			{
+				_initChatMsgDate = value;
+			}
+
+			
+			private var _targetUser:User;
+
+			public function get targetUser():User
+			{
+				return _targetUser;
+			}
+			
+			public function receiveMsg(userName:String,msg:String,date:String):void{
+				outTxt.appendText(userName+" "+date+":\n"+msg+"\n");
+			}
+
+			public function set targetUser(value:User):void
+			{
+				_targetUser = value;
+			}
+
+			public function get targetUserName():String{
+				return targetUser.userName;
+			}
+			
+			public function get targetUserID():String{
+				return targetUser.userID;
+			}
+
+			protected function titlewindow1_closeHandler(event:CloseEvent):void
+			{
+				PopUpManager.removePopUp(this);
+				ChatWindow.removeChatWindow(this);
+			}
+
+
+			protected function sendBtn_clickHandler(event:MouseEvent):void
+			{
+				sendMsg();
+			}
+			
+			private function sendMsg():void{
+				if(inTxt.text!=""){
+					NetConnectionManager.sendChatMsg(targetUserID,targetUserName,inTxt.text);
+					inTxt.text="";
+				}
+			}
+
+
+			protected function inTxt_keyUpHandler(event:KeyboardEvent):void
+			{
+				if(event.keyCode==Keyboard.ENTER){
+					sendMsg();
+				}
+			}
+
+
+			protected function outTxt_creationCompleteHandler(event:FlexEvent):void
+			{
+				if(initChatMsg!=""){
+					this.receiveMsg(targetUserName,initChatMsg,initChatMsgDate);
+				}
+			}
+
+
+			protected function reqVideoBtn_clickHandler(event:MouseEvent):void
+			{
+				NetConnectionManager.reqVideoChat(targetUserID,UserInfo.userInfo.userID,UserInfo.userInfo.userName);
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:TextArea id="outTxt" width="100%" height="100%" bottom="50" creationComplete="outTxt_creationCompleteHandler(event)"/>
+	<s:TextInput id="inTxt" text="" width="100%" bottom="25" keyUp="inTxt_keyUpHandler(event)"/>
+	<s:Button id="reqVideoBtn" left="10" bottom="2" label="请求与对方进行视频聊天" click="reqVideoBtn_clickHandler(event)"/>
+	<s:Button id="sendBtn" right="10" bottom="2" label="发送" click="sendBtn_clickHandler(event)"/>
+</s:TitleWindow>

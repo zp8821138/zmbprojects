@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="application1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import com.xm.chatclient.net.NetConnectionManager;
+			import com.xm.chatclient.user.User;
+			import com.xm.chatclient.user.UserInfo;
+			import com.xm.chatclient.views.ChatWindow;
+			import com.xm.chatclient.views.LoginPanel;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			
+			
+			[Bindable]
+			private var listData:ArrayCollection=new ArrayCollection;
+			
+			
+			/**
+			 * 重建列表
+			 */
+			public function reBuildList(arr:Array):void{
+				listData.source=arr;
+			}
+
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				//Alert.show("最新程序");
+				LoginPanel.show=true;
+			}
+
+
+			protected function sendBtn_clickHandler(event:MouseEvent):void
+			{
+				sendMsg();
+			}
+			
+			private function sendMsg():void{
+				if(inTxt.text==""){
+					Alert.show("请输入要发送的内容");
+				}else{
+					NetConnectionManager.sendMsgToAll(inTxt.text);
+					inTxt.text="";
+				}
+			}
+
+
+			protected function inTxt_keyUpHandler(event:KeyboardEvent):void
+			{
+				if(event.keyCode==Keyboard.ENTER){
+					sendMsg();
+				}
+			}
+
+
+			protected function userList_doubleClickHandler(event:MouseEvent):void
+			{
+				var user:User=userList.selectedItem as User;
+				
+				if(user!=null){
+					if(user.userID!=UserInfo.userInfo.userID){
+						ChatWindow.getChatWindow(user);
+					}else{
+						Alert.show("你不能和自己聊天");
+					}
+				}
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<s:TextArea id="outTxt" editable="false" width="100%" height="100%" left="10" right="170" top="10" bottom="100"/>
+	<s:TextInput id="inTxt" width="100%" left="10" right="170" bottom="60" keyUp="inTxt_keyUpHandler(event)"/>
+	<s:Button label="发送" id="sendBtn" right="170" bottom="30" click="sendBtn_clickHandler(event)"/>
+	<s:Group  width="150" height="100%" right="10" top="10" bottom="10">
+		<s:layout>
+			<s:VerticalLayout/>
+		</s:layout>
+		
+		<s:Label text="在线用户列表：" />
+		<s:List id="userList" labelField="userName" width="100%" height="100%" dataProvider="{listData}" doubleClickEnabled="true" doubleClick="userList_doubleClickHandler(event)"/>
+	</s:Group>
+</s:Application>

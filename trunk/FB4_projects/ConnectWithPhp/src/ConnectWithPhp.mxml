@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   xmlns:utils="com.xm.utils.*">
+
+	<fx:Script>
+		<![CDATA[
+			
+			private const SERVER_PAGE:String="http://127.0.0.1/server.php";
+			
+			protected function sendBtn_clickHandler(event:MouseEvent):void
+			{
+				var req:URLRequest=new URLRequest(SERVER_PAGE);
+				//req.method=URLRequestMethod.POST;
+				req.method=URLRequestMethod.GET;
+				
+
+				var updata:URLVariables=new URLVariables;
+				updata.uname="Heteng";
+				updata.passwd="123456";
+				
+				req.data=updata;
+				
+				_ul.load(req);
+			}
+
+			protected function _ul_completeHandler(event:Event):void
+			{
+				outTxt.text=String(_ul.data);
+			}
+
+		]]>
+	</fx:Script>
+
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+		<utils:CustomURLLoader id="_ul" complete="_ul_completeHandler(event)"/>
+	</fx:Declarations>
+	<s:TextArea id="outTxt" x="34" y="63"/>
+	<s:Button x="34" y="255" label="发送" id="sendBtn" click="sendBtn_clickHandler(event)"/>
+</s:Application>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:samplephp="services.samplephp.*">
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.rpc.events.ResultEvent;
+			
+			protected function sendBtn_clickHandler(event:MouseEvent):void
+			{
+				helloWorldResult.token = samplePhp.helloWorld();
+				nihaoResult.token=samplePhp.nihao();
+			}
+			
+
+			protected function helloWorldResult_resultHandler(event:ResultEvent):void
+			{
+				trace(event.result);
+			}
+
+
+			protected function nihaoResult_resultHandler(event:ResultEvent):void
+			{
+				trace(event.result);
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<s:CallResponder id="helloWorldResult" result="helloWorldResult_resultHandler(event)"/>
+		<s:CallResponder id="nihaoResult" result="nihaoResult_resultHandler(event)"/>
+		<samplephp:SamplePhp id="samplePhp" fault="Alert.show(event.fault.faultString + '\n' + event.fault.faultDetail)" showBusyCursor="true"/>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:Button x="49" y="60" label="发送" id="sendBtn" click="sendBtn_clickHandler(event)"/>
+</s:Application>

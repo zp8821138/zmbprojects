@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   cornerRadius="5" 
+			   width="400" height="300" 
+			   close="titlewindow1_closeHandler(event)">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<fx:Metadata>
+		/**
+		 * 在窗体关闭前触发此事件
+		 */
+		[Event(name="customWindowClosing",type="com.xingmo.cee.CustomWindowEvent")]
+		
+		/**
+		 * 在窗体关闭后触发此事件
+		 */
+		[Event(name="customWindowClose",type="com.xingmo.cee.CustomWindowEvent")]
+	</fx:Metadata>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.events.CloseEvent;
+			import mx.managers.PopUpManager;
+			
+			
+			
+			/**
+			 * 弹出一个窗体
+			 * @param	title	窗体的标题
+			 */
+			public static function show(title:String):CustomWindow{
+				var win:CustomWindow=new CustomWindow;
+				win.title=title;
+				
+				PopUpManager.addPopUp(win,FlexGlobals.topLevelApplication as DisplayObject);
+				PopUpManager.centerPopUp(win);
+				return win;
+			}
+			
+			/**
+			 * 关闭此窗体
+			 */
+			public function close():void{
+				PopUpManager.removePopUp(this);
+				dispatchEvent(new CustomWindowEvent(CustomWindowEvent.CUSTOM_WINDOW_CLOSE));
+			}
+
+			protected function titlewindow1_closeHandler(event:CloseEvent):void
+			{
+				
+				if(dispatchEvent(new CustomWindowEvent(CustomWindowEvent.CUSTOM_WINDOW_CLOSING,false,true))){
+					close();
+				}
+			}
+
+		]]>
+	</fx:Script>
+</s:TitleWindow>

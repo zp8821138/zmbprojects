@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" width="480" height="355" close="titlewindow1_closeHandler(event)">
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	<fx:Script>
+		<![CDATA[
+			import com.xm.chatclient.net.NetConnectionManager;
+			
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+
+			private var video:Video;
+			
+			private var playStream:NetStream;
+			private var publishStream:NetStream;
+			
+			public function startChat(playID:String,publishID:String):void{
+				PopUpManager.addPopUp(this,FlexGlobals.topLevelApplication as DisplayObject);
+				
+				initVideo();
+				
+				//看对方的摄像头
+				playStream=new NetStream(NetConnectionManager.netConnetion);
+				video.attachNetStream(playStream);
+				playStream.play(playID);
+				
+				//发布自己的摄像头
+				publishStream=new NetStream(NetConnectionManager.netConnetion);
+				var mic:Microphone=Microphone.getMicrophone();
+				if(mic!=null){
+					publishStream.attachAudio(mic);
+				}else{
+					Alert.show("找不到麦克风或者当前麦克风正在被其它程序使用","提示");
+				}
+				
+				var camera:Camera=Camera.getCamera();
+				if(camera!=null){
+					publishStream.attachCamera(camera);
+				}else{
+					Alert.show("找不到摄像头","提示");
+				}
+				
+				publishStream.publish(publishID,"live");
+			}
+			
+			private function initVideo():void{
+				if(video==null){
+					video=new Video(480,320);
+				}
+			}
+
+
+			protected function titlewindow1_closeHandler(event:CloseEvent):void
+			{
+				PopUpManager.removePopUp(this);
+				
+				if(publishStream!=null){
+					publishStream.close();
+				}
+				if(playStream!=null){
+					playStream.close();
+				}
+			}
+
+
+			protected function chatVideoContainer_creationCompleteHandler(event:FlexEvent):void
+			{
+				initVideo();
+				chatVideoContainer.addChild(video);
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	
+	<mx:UIComponent id="chatVideoContainer" width="100%" height="100%" creationComplete="chatVideoContainer_creationCompleteHandler(event)"/>
+</s:TitleWindow>

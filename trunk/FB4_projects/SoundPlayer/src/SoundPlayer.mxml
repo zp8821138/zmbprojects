@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   creationComplete="windowedapplication1_creationCompleteHandler(event)"
+					    nativeDragEnter="windowedapplication1_nativeDragEnterHandler(event)"
+						 nativeDragDrop="windowedapplication1_nativeDragDropHandler(event)"
+						  invoke="windowedapplication1_invokeHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import flash.utils.getQualifiedClassName;
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			
+			
+			private var windowMenu:NativeMenu=new NativeMenu;
+			private var fileMenu:NativeMenu=new NativeMenu;
+			private var openItem:NativeMenuItem=new NativeMenuItem("打开mp3文件");
+			private var quitItem:NativeMenuItem=new NativeMenuItem("退出");
+			
+			private var helpMenu:NativeMenu=new NativeMenu;
+			private var aboutItem:NativeMenuItem=new NativeMenuItem("关于");
+			
+			private var file:File;
+			private var fileFilter:FileFilter=new FileFilter("mp3文件","*.mp3");
+			
+			private var mp3:Sound;
+			private var channel:SoundChannel;
+			
+			private var currentAlert:Alert;
+
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				
+				windowMenu.addSubmenu(fileMenu,"文件");
+				fileMenu.addItem(openItem);
+				fileMenu.addItem(new NativeMenuItem("",true));
+				fileMenu.addItem(quitItem);
+				
+				windowMenu.addSubmenu(helpMenu,"帮助");
+				helpMenu.addItem(aboutItem);
+				
+				this.nativeWindow.menu=windowMenu;
+				
+				
+				openItem.addEventListener(Event.SELECT,selectItemHandler);
+				quitItem.addEventListener(Event.SELECT,selectItemHandler);
+				
+				aboutItem.addEventListener(Event.SELECT,selectItemHandler);
+			}
+			
+			private function selectItemHandler(event:Event):void{
+				switch(event.target){
+					case openItem:
+						openMp3();
+						break;
+					case quitItem:
+						NativeApplication.nativeApplication.exit();
+						break;
+					case aboutItem:
+						if(currentAlert==null){
+							currentAlert=Alert.show("AMP v 1.0","关于此产品",4,null,closeAlertHandler);
+						}
+						break;
+				}
+			}
+			
+			private function closeAlertHandler(event:CloseEvent):void{
+				currentAlert=null;
+			}
+			
+			private function openMp3():void{
+				file=new File;
+				file.browseForOpen("打开一个MP3文件",[fileFilter]);
+				file.addEventListener(Event.SELECT,selectedFileHandler);
+			}
+			
+			private function selectedFileHandler(event:Event):void{
+				file.removeEventListener(Event.SELECT,selectedFileHandler);
+				
+				startLoadMp3(file);
+			}
+			
+			private function startLoadMp3(file:File):void{
+				startLoadMp3ByPath(file.url);
+				
+				this.title=file.name;
+			}
+			
+			private function startLoadMp3ByPath(path:String):void{
+				mp3=new Sound;
+				mp3.load(new URLRequest(path));
+				
+				mp3.addEventListener(Event.COMPLETE,completeHandler);
+			}
+			
+			private function completeHandler(event:Event):void{
+				mp3.removeEventListener(Event.COMPLETE,completeHandler);
+				
+				if(channel!=null){
+					channel.stop();
+				}
+				channel=mp3.play();
+			}
+
+
+			protected function windowedapplication1_nativeDragEnterHandler(event:NativeDragEvent):void
+			{
+				var fileList:Array=event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array;
+				
+				if(fileList==null){
+					return;
+				}				
+
+				var getedFile:File=fileList[0] as File;
+				if(getedFile.extension=="mp3"){
+					NativeDragManager.acceptDragDrop(this);
+				}
+			}
+
+
+			protected function windowedapplication1_nativeDragDropHandler(event:NativeDragEvent):void
+			{
+				var fileList:Array=event.clipboard.getData(ClipboardFormats.FILE_LIST_FORMAT) as Array;
+				var getedFile:File=fileList[0] as File;
+				
+				startLoadMp3(getedFile);
+			}
+
+
+			protected function windowedapplication1_invokeHandler(event:InvokeEvent):void
+			{
+				if(event.arguments.length){
+					var filePath:String=event.arguments[0];
+					if(filePath.slice(filePath.lastIndexOf("."),filePath.length)==".mp3"){
+						var fileName:String=filePath.slice(filePath.lastIndexOf("\\")+1);
+						this.title=fileName;
+						startLoadMp3ByPath(filePath);
+					}
+				}
+			}
+
+
+			protected function volumnBar_changeHandler(event:Event):void
+			{
+				if(channel==null){
+					return;
+				}
+				
+				var soundTransform:SoundTransform=channel.soundTransform;
+				soundTransform.volume=volumnBar.value/volumnBar.maximum;
+				channel.soundTransform=soundTransform;
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+	<s:HSlider id="volumnBar" value="100" width="300" maximum="100" x="42" y="45" change="volumnBar_changeHandler(event)"/>
+	<s:Label x="10" y="45" text="声音"/>
+</s:WindowedApplication>

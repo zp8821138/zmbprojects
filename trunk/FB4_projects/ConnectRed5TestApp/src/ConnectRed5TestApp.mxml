@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" creationComplete="application1_creationCompleteHandler(event)">
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+
+			private var conn:NetConnection=new NetConnection;
+			
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				conn.addEventListener(NetStatusEvent.NET_STATUS,netStatusHandler);
+				conn.connect("rtmp://localhost/test","heteng","123");
+			}
+			
+			private function netStatusHandler(event:NetStatusEvent):void{
+				trace(event.info.code);
+			}
+
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 将非可视元素（例如服务、值对象）放在此处 -->
+	</fx:Declarations>
+</s:Application>
